@@ -2,8 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"runtime"
 
+	"github.com/Litchi-group/unipm/internal/detector"
+	"github.com/Litchi-group/unipm/internal/provider"
 	"github.com/spf13/cobra"
 )
 
@@ -22,27 +23,59 @@ func init() {
 }
 
 func runDoctor() error {
-	fmt.Printf("OS: %s\n", runtime.GOOS)
-	fmt.Printf("Architecture: %s\n", runtime.GOARCH)
+	// Detect OS
+	osInfo := detector.DetectOS()
+	
+	fmt.Printf("OS: %s\n", osInfo.String())
+	fmt.Printf("Architecture: %s\n", osInfo.Arch)
 	fmt.Println()
 	
-	// TODO: Implement actual provider checks
-	fmt.Println("Package manager checks not yet implemented.")
-	fmt.Println()
-	fmt.Println("Future output:")
+	// Check providers based on OS
+	var providers []provider.Provider
 	
-	switch runtime.GOOS {
-	case "darwin":
-		fmt.Println("  ✓ Homebrew: installed (/opt/homebrew/bin/brew)")
-	case "windows":
-		fmt.Println("  ✓ WinGet: installed")
-	case "linux":
-		fmt.Println("  ✓ apt: installed (/usr/bin/apt)")
-		fmt.Println("  ✓ snap: installed (/usr/bin/snap)")
+	switch {
+	case osInfo.IsMacOS():
+		providers = []provider.Provider{
+			provider.NewBrewProvider(),
+		}
+	case osInfo.IsWindows():
+		providers = []provider.Provider{
+			provider.NewWinGetProvider(),
+		}
+	case osInfo.IsLinux():
+		providers = []provider.Provider{
+			provider.NewAptProvider(),
+			provider.NewSnapProvider(),
+		}
+	}
+	
+	// Check each provider
+	allAvailable := true
+	for _, p := range providers {
+		if p.IsAvailable() {
+			fmt.Printf("✓ %s: available\n", p.Name())
+		} else {
+			fmt.Printf("✗ %s: not found\n", p.Name())
+			allAvailable = false
+		}
 	}
 	
 	fmt.Println()
-	fmt.Println("All required tools are available.")
+	
+	if allAvailable {
+		fmt.Println("All required tools are available.")
+	} else {
+		fmt.Println("Some required tools are missing.")
+		fmt.Println()
+		
+		// Show installation guides for missing tools
+		for _, p := range providers {
+			if !p.IsAvailable() {
+				fmt.Println(provider.GetInstallationGuide(p.Name()))
+				fmt.Println()
+			}
+		}
+	}
 	
 	return nil
 }
