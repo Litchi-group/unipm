@@ -1,8 +1,15 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"strings"
 
+	"github.com/Litchi-group/unipm/internal/config"
+	"github.com/Litchi-group/unipm/internal/detector"
+	"github.com/Litchi-group/unipm/internal/planner"
+	"github.com/Litchi-group/unipm/internal/registry"
 	"github.com/spf13/cobra"
 )
 
@@ -32,23 +39,74 @@ func init() {
 }
 
 func runApply() error {
-	// TODO: Implement apply logic
+	// Load devpack.yaml
+	devpack, err := config.Load("devpack.yaml")
+	if err != nil {
+		return fmt.Errorf("failed to load devpack.yaml: %w", err)
+	}
+	
+	if len(devpack.Apps) == 0 {
+		fmt.Println("No packages specified in devpack.yaml")
+		return nil
+	}
+	
+	// Detect OS
+	osInfo := detector.DetectOS()
+	
+	// Create planner
+	reg := registry.NewRegistry()
+	plnr := planner.NewPlanner(reg, osInfo)
+	
+	// Create plan
+	plan, err := plnr.CreatePlan(devpack.Apps)
+	if err != nil {
+		return err
+	}
+	
+	// Show plan summary
+	fmt.Printf("Plan for %s:\n\n", osInfo.String())
+	
+	newInstalls := 0
+	for _, task := range plan.Tasks {
+		if !task.Installed {
+			newInstalls++
+			fmt.Printf("  %s → %s\n", task.PackageID, task.Provider.InstallCommand(*task.Spec))
+		} else {
+			fmt.Printf("  %s (already installed)\n", task.PackageID)
+		}
+	}
+	
+	fmt.Println()
+	
+	if newInstalls == 0 {
+		fmt.Println("All packages are already installed.")
+		return nil
+	}
+	
+	// Prompt for confirmation unless --yes or --dry-run
+	if !dryRun && !yes {
+		fmt.Printf("Do you want to proceed with installing %d package(s)? [y/N]: ", newInstalls)
+		
+		reader := bufio.NewReader(os.Stdin)
+		response, err := reader.ReadString('\n')
+		if err != nil {
+			return fmt.Errorf("failed to read input: %w", err)
+		}
+		
+		response = strings.ToLower(strings.TrimSpace(response))
+		if response != "y" && response != "yes" {
+			fmt.Println("Cancelled.")
+			return nil
+		}
+		
+		fmt.Println()
+	}
+	
+	// Execute plan
 	if dryRun {
 		fmt.Println("Dry run mode enabled. Nothing will be executed.")
 		fmt.Println()
 	}
 	
-	fmt.Println("Apply not yet implemented.")
-	fmt.Println()
-	fmt.Println("Future output:")
-	fmt.Println("  Installing vscode...")
-	fmt.Println("    ✓ brew install --cask visual-studio-code")
-	fmt.Println("  Installing git...")
-	fmt.Println("    ⊙ Already installed")
-	fmt.Println("  Installing node...")
-	fmt.Println("    ✓ brew install node")
-	fmt.Println()
-	fmt.Println("Done! 2 installed, 1 skipped.")
-	
-	return nil
+	return plan.Execute(dryRun)
 }

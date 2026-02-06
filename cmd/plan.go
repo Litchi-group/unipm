@@ -5,7 +5,7 @@ import (
 
 	"github.com/Litchi-group/unipm/internal/config"
 	"github.com/Litchi-group/unipm/internal/detector"
-	"github.com/Litchi-group/unipm/internal/provider"
+	"github.com/Litchi-group/unipm/internal/planner"
 	"github.com/Litchi-group/unipm/internal/registry"
 	"github.com/spf13/cobra"
 )
@@ -41,34 +41,18 @@ func runPlan() error {
 	// Detect OS
 	osInfo := detector.DetectOS()
 	
-	// Create registry and resolver
+	// Create planner
 	reg := registry.NewRegistry()
-	resolver := registry.NewResolver(reg, osInfo)
+	plnr := planner.NewPlanner(reg, osInfo)
 	
-	// Resolve packages
-	fmt.Printf("Plan for %s:\n\n", osInfo.String())
-	
-	for _, packageID := range devpack.Apps {
-		spec, err := resolver.Resolve(packageID)
-		if err != nil {
-			fmt.Printf("  ✗ %s: %v\n", packageID, err)
-			continue
-		}
-		
-		// Get provider
-		prov, err := provider.GetProviderByType(spec.Type)
-		if err != nil {
-			fmt.Printf("  ✗ %s: %v\n", packageID, err)
-			continue
-		}
-		
-		// Format command
-		cmd := prov.InstallCommand(*spec)
-		fmt.Printf("  %s → %s\n", packageID, cmd)
+	// Create plan
+	plan, err := plnr.CreatePlan(devpack.Apps)
+	if err != nil {
+		return err
 	}
 	
-	fmt.Println()
-	fmt.Println("To apply this plan, run 'unipm apply'.")
+	// Print plan
+	plan.Print()
 	
 	return nil
 }
