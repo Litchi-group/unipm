@@ -51,13 +51,39 @@ vscode
 
 ## 📦 Installation
 
-> Coming soon via GitHub Releases
+### From Releases (Recommended)
 
+Download the latest release for your platform:
+
+**macOS (Intel)**
 ```bash
-# Example (macOS / Linux)
-curl -L https://github.com/yourname/unipm/releases/latest/download/unipm \
+curl -L https://github.com/Litchi-group/unipm/releases/latest/download/unipm-darwin-amd64 \
   -o /usr/local/bin/unipm
 chmod +x /usr/local/bin/unipm
+```
+
+**macOS (Apple Silicon)**
+```bash
+curl -L https://github.com/Litchi-group/unipm/releases/latest/download/unipm-darwin-arm64 \
+  -o /usr/local/bin/unipm
+chmod +x /usr/local/bin/unipm
+```
+
+**Linux (amd64)**
+```bash
+curl -L https://github.com/Litchi-group/unipm/releases/latest/download/unipm-linux-amd64 \
+  -o /usr/local/bin/unipm
+chmod +x /usr/local/bin/unipm
+```
+
+**Windows (amd64)**
+Download from [Releases](https://github.com/Litchi-group/unipm/releases) and add to PATH.
+
+### From Source
+```bash
+git clone https://github.com/Litchi-group/unipm.git
+cd unipm
+go install .
 ```
 
 ---
