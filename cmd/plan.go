@@ -3,6 +3,10 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/Litchi-group/unipm/internal/config"
+	"github.com/Litchi-group/unipm/internal/detector"
+	"github.com/Litchi-group/unipm/internal/provider"
+	"github.com/Litchi-group/unipm/internal/registry"
 	"github.com/spf13/cobra"
 )
 
@@ -23,13 +27,46 @@ func init() {
 }
 
 func runPlan() error {
-	// TODO: Implement plan generation
-	fmt.Println("Plan generation not yet implemented.")
-	fmt.Println()
-	fmt.Println("Future output:")
-	fmt.Println("  vscode → brew install --cask visual-studio-code")
-	fmt.Println("  git    → brew install git")
-	fmt.Println("  node   → brew install node")
+	// Load devpack.yaml
+	devpack, err := config.Load("devpack.yaml")
+	if err != nil {
+		return fmt.Errorf("failed to load devpack.yaml: %w", err)
+	}
+	
+	if len(devpack.Apps) == 0 {
+		fmt.Println("No packages specified in devpack.yaml")
+		return nil
+	}
+	
+	// Detect OS
+	osInfo := detector.DetectOS()
+	
+	// Create registry and resolver
+	reg := registry.NewRegistry()
+	resolver := registry.NewResolver(reg, osInfo)
+	
+	// Resolve packages
+	fmt.Printf("Plan for %s:\n\n", osInfo.String())
+	
+	for _, packageID := range devpack.Apps {
+		spec, err := resolver.Resolve(packageID)
+		if err != nil {
+			fmt.Printf("  ✗ %s: %v\n", packageID, err)
+			continue
+		}
+		
+		// Get provider
+		prov, err := provider.GetProviderByType(spec.Type)
+		if err != nil {
+			fmt.Printf("  ✗ %s: %v\n", packageID, err)
+			continue
+		}
+		
+		// Format command
+		cmd := prov.InstallCommand(*spec)
+		fmt.Printf("  %s → %s\n", packageID, cmd)
+	}
+	
 	fmt.Println()
 	fmt.Println("To apply this plan, run 'unipm apply'.")
 	
