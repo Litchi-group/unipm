@@ -59,3 +59,28 @@ func (p *WinGetProvider) InstallCommand(spec ProviderSpec) string {
 	
 	return FormatCommand("winget", args...)
 }
+
+// Remove removes a package using WinGet
+func (p *WinGetProvider) Remove(spec ProviderSpec) error {
+	packageID := spec.ID
+	if packageID == "" {
+		packageID = spec.Name
+	}
+	
+	args := []string{"uninstall", "--id", packageID, "--silent"}
+	
+	fmt.Printf("  → %s\n", FormatCommand("winget", args...))
+	return execCommandSilent("winget", args...)
+}
+
+// RemoveCommand returns the uninstall command
+func (p *WinGetProvider) RemoveCommand(spec ProviderSpec) string {
+	packageID := spec.ID
+	if packageID == "" {
+		packageID = spec.Name
+	}
+	
+	args := []string{"uninstall", "--id", packageID}
+	
+	return FormatCommand("winget", args...)
+}

@@ -17,11 +17,17 @@ type Provider interface {
 	// Install installs a package
 	Install(spec ProviderSpec) error
 
+	// Remove removes a package
+	Remove(spec ProviderSpec) error
+
 	// IsInstalled checks if a package is already installed
 	IsInstalled(spec ProviderSpec) bool
 
 	// InstallCommand returns the command that would be executed
 	InstallCommand(spec ProviderSpec) string
+
+	// RemoveCommand returns the uninstall command
+	RemoveCommand(spec ProviderSpec) string
 }
 
 // ProviderSpec contains provider-specific package information

@@ -65,3 +65,20 @@ func (p *SnapProvider) InstallCommand(spec ProviderSpec) string {
 	
 	return FormatCommand("sudo snap", args...)
 }
+
+// Remove removes a package using Snap
+func (p *SnapProvider) Remove(spec ProviderSpec) error {
+	args := []string{"remove", spec.Name}
+	
+	fmt.Printf("  → %s\n", FormatCommand("sudo snap", args...))
+	
+	// Snap requires sudo
+	return execCommandSilent("sudo", append([]string{"snap"}, args...)...)
+}
+
+// RemoveCommand returns the uninstall command
+func (p *SnapProvider) RemoveCommand(spec ProviderSpec) string {
+	args := []string{"remove", spec.Name}
+	
+	return FormatCommand("sudo snap", args...)
+}

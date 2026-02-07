@@ -62,3 +62,30 @@ func (p *BrewProvider) InstallCommand(spec ProviderSpec) string {
 	
 	return FormatCommand("brew", args...)
 }
+
+// Remove removes a package using Homebrew
+func (p *BrewProvider) Remove(spec ProviderSpec) error {
+	args := []string{"uninstall"}
+	
+	if spec.Type == "brew_cask" {
+		args = append(args, "--cask")
+	}
+	
+	args = append(args, spec.Name)
+	
+	fmt.Printf("  → %s\n", FormatCommand("brew", args...))
+	return execCommandSilent("brew", args...)
+}
+
+// RemoveCommand returns the uninstall command
+func (p *BrewProvider) RemoveCommand(spec ProviderSpec) string {
+	args := []string{"uninstall"}
+	
+	if spec.Type == "brew_cask" {
+		args = append(args, "--cask")
+	}
+	
+	args = append(args, spec.Name)
+	
+	return FormatCommand("brew", args...)
+}

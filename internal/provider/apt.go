@@ -55,3 +55,19 @@ func (p *AptProvider) InstallCommand(spec ProviderSpec) string {
 	args := []string{"install", "-y", spec.Name}
 	return FormatCommand("sudo apt", args...)
 }
+
+// Remove removes a package using APT
+func (p *AptProvider) Remove(spec ProviderSpec) error {
+	args := []string{"remove", "-y", spec.Name}
+	
+	fmt.Printf("  → %s\n", FormatCommand("sudo apt", args...))
+	
+	// APT requires sudo
+	return execCommandSilent("sudo", append([]string{"apt"}, args...)...)
+}
+
+// RemoveCommand returns the uninstall command
+func (p *AptProvider) RemoveCommand(spec ProviderSpec) string {
+	args := []string{"remove", "-y", spec.Name}
+	return FormatCommand("sudo apt", args...)
+}

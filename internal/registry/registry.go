@@ -15,16 +15,20 @@ const (
 	// DefaultRegistryURL is the default GitHub raw URL for the registry
 	DefaultRegistryURL = "https://raw.githubusercontent.com/Litchi-group/unipm-registry/main/packages"
 	
+	// IndexURL is the URL for the package index
+	IndexURL = "https://raw.githubusercontent.com/Litchi-group/unipm-registry/main/index.yaml"
+	
 	// CacheDir is the local cache directory
 	CacheDir = ".unipm/cache"
 )
 
 // Package represents a package definition from the registry
 type Package struct {
-	ID        string                       `yaml:"id"`
-	Name      string                       `yaml:"name"`
-	Homepage  string                       `yaml:"homepage"`
-	Providers map[string][]ProviderMapping `yaml:"providers"`
+	ID           string                       `yaml:"id"`
+	Name         string                       `yaml:"name"`
+	Homepage     string                       `yaml:"homepage"`
+	Dependencies []string                     `yaml:"dependencies,omitempty"`
+	Providers    map[string][]ProviderMapping `yaml:"providers"`
 }
 
 // ProviderMapping represents OS-specific provider configuration
@@ -33,6 +37,17 @@ type ProviderMapping struct {
 	Name    string `yaml:"name"`    // Package name
 	ID      string `yaml:"id"`      // Package ID (for winget)
 	Classic bool   `yaml:"classic"` // Classic mode (for snap)
+}
+
+// PackageInfo represents minimal package information for listing/searching
+type PackageInfo struct {
+	ID   string `yaml:"id"`
+	Name string `yaml:"name"`
+}
+
+// PackageIndex represents the package index file
+type PackageIndex struct {
+	Packages []PackageInfo `yaml:"packages"`
 }
 
 // Registry manages package definitions
@@ -48,14 +63,8 @@ func NewRegistry() *Registry {
 	homeDir, _ := os.UserHomeDir()
 	cacheDir := filepath.Join(homeDir, CacheDir)
 	
-	// Check for local registry path (for development/testing)
-	baseURL := DefaultRegistryURL
-	if localPath := os.Getenv("UNIPM_REGISTRY_PATH"); localPath != "" {
-		baseURL = "file://" + localPath
-	}
-	
 	return &Registry{
-		baseURL:  baseURL,
+		baseURL:  DefaultRegistryURL,
 		cacheDir: cacheDir,
 		cacheTTL: 24 * time.Hour, // Cache for 24 hours
 		client: &http.Client{
@@ -85,11 +94,6 @@ func (r *Registry) LoadPackage(packageID string) (*Package, error) {
 
 // fetchPackage fetches a package definition from the remote registry
 func (r *Registry) fetchPackage(packageID string) (*Package, error) {
-	// Handle local file:// URLs (for development/testing)
-	if len(r.baseURL) > 7 && r.baseURL[:7] == "file://" {
-		return r.fetchPackageFromFile(packageID)
-	}
-	
 	url := fmt.Sprintf("%s/%s.yaml", r.baseURL, packageID)
 	
 	resp, err := r.client.Get(url)
@@ -109,27 +113,6 @@ func (r *Registry) fetchPackage(packageID string) (*Package, error) {
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read response: %w", err)
-	}
-	
-	var pkg Package
-	if err := yaml.Unmarshal(data, &pkg); err != nil {
-		return nil, fmt.Errorf("failed to parse package definition: %w", err)
-	}
-	
-	return &pkg, nil
-}
-
-// fetchPackageFromFile fetches a package from local file system
-func (r *Registry) fetchPackageFromFile(packageID string) (*Package, error) {
-	localPath := r.baseURL[7:] // Remove "file://" prefix
-	filePath := filepath.Join(localPath, "packages", packageID+".yaml")
-	
-	data, err := os.ReadFile(filePath)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("package not found: %s", packageID)
-		}
-		return nil, fmt.Errorf("failed to read package file: %w", err)
 	}
 	
 	var pkg Package
@@ -189,4 +172,29 @@ func (r *Registry) saveToCache(packageID string, pkg *Package) error {
 // getCachePath returns the cache file path for a package
 func (r *Registry) getCachePath(packageID string) string {
 	return filepath.Join(r.cacheDir, packageID+".yaml")
+}
+
+// LoadIndex loads the package index from the registry
+func (r *Registry) LoadIndex() ([]PackageInfo, error) {
+	resp, err := r.client.Get(IndexURL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch index: %w", err)
+	}
+	defer resp.Body.Close()
+	
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("unexpected status code %d for index", resp.StatusCode)
+	}
+	
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read index: %w", err)
+	}
+	
+	var index PackageIndex
+	if err := yaml.Unmarshal(data, &index); err != nil {
+		return nil, fmt.Errorf("failed to parse index: %w", err)
+	}
+	
+	return index.Packages, nil
 }

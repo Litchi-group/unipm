@@ -24,28 +24,37 @@ type Plan struct {
 
 // Planner generates installation plans
 type Planner struct {
-	registry *registry.Registry
-	resolver *registry.Resolver
-	osInfo   *detector.OSInfo
+	registry  *registry.Registry
+	resolver  *registry.Resolver
+	depResolver *registry.DependencyResolver
+	osInfo    *detector.OSInfo
 }
 
 // NewPlanner creates a new Planner
 func NewPlanner(reg *registry.Registry, osInfo *detector.OSInfo) *Planner {
 	return &Planner{
-		registry: reg,
-		resolver: registry.NewResolver(reg, osInfo),
-		osInfo:   osInfo,
+		registry:  reg,
+		resolver:  registry.NewResolver(reg, osInfo),
+		depResolver: registry.NewDependencyResolver(reg),
+		osInfo:    osInfo,
 	}
 }
 
 // CreatePlan creates an installation plan for the given package IDs
+// Resolves dependencies and orders packages correctly
 func (p *Planner) CreatePlan(packageIDs []string) (*Plan, error) {
+	// Resolve dependencies (returns packages in installation order)
+	orderedIDs, err := p.depResolver.Resolve(packageIDs)
+	if err != nil {
+		return nil, fmt.Errorf("dependency resolution failed: %w", err)
+	}
+	
 	plan := &Plan{
-		Tasks:  make([]*InstallTask, 0, len(packageIDs)),
+		Tasks:  make([]*InstallTask, 0, len(orderedIDs)),
 		OSInfo: p.osInfo,
 	}
 	
-	for _, packageID := range packageIDs {
+	for _, packageID := range orderedIDs {
 		// Resolve package to provider spec
 		spec, err := p.resolver.Resolve(packageID)
 		if err != nil {
