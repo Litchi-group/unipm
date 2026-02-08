@@ -72,16 +72,135 @@ First public release of unipm - Universal package manager orchestrator.
 
 ---
 
-## [Unreleased]
+## [0.1.2] - 2026-02-09
 
-### Planned for v0.2
-- Version pinning and lockfiles
-- Custom/private registries
-- IDE and dotfile synchronization
-- Package search command
-- More package managers (chocolatey, scoop, etc.)
-- More packages in registry
+### Added
+
+#### Version Management
+- Version parsing and comparison (`internal/version`)
+- Support for semantic versioning constraints:
+  - Exact: `node@18`, `python@3.10`
+  - Wildcard: `node@18.x`
+  - Range: `~18.16`, `^1.2.3`, `>=2.0`
+- `PackageSpec` with optional version field
+
+#### Profile System
+- Profile support in `devpack.yaml`:
+  ```yaml
+  profiles:
+    web:
+      - node
+      - vscode
+    python:
+      - python
+      - pycharm
+  ```
+- `--profile` flag for `plan` and `apply` commands
+- Profile-specific package lists
+
+#### Export/Import
+- `unipm export [file]` - Export installed packages to devpack.yaml
+- `unipm import [file]` - Import and install from devpack.yaml
+- `ListInstalled()` interface for all providers
+- Cross-provider package detection
+
+#### Configuration System
+- Global config: `~/.unipm/config.yaml`
+- Registry URL customization
+- Cache TTL configuration
+- Log level settings
+
+#### Package Management Commands
+- `unipm list` - List installed packages
+- `unipm search <query>` - Search registry
+- `unipm info <package>` - Show package details
+- `unipm update` - Update package managers
+- `unipm remove <package>` - Remove packages
+
+#### Dependency Resolution
+- Topological sort for dependency ordering
+- Circular dependency detection with cycle path
+- Diamond dependency handling
+- `GetDependencyTree()` for visualization
+
+#### Error Handling
+- Structured error types:
+  - `NotFoundError` - Package not found
+  - `CircularDependencyError` - Dependency cycle
+  - `ProviderUnavailableError` - Missing provider
+  - `NetworkError` - Registry access issues
+  - `ConfigError` - Configuration problems
+- User-friendly error messages with suggestions
+
+#### Infrastructure
+- Test infrastructure:
+  - Test helpers (`internal/testing/helpers.go`)
+  - MockRegistry for testing
+  - Detector tests (8 tests)
+- Logging system:
+  - `internal/logger` with DEBUG/INFO/WARN/ERROR levels
+  - `--verbose` flag for debug output
+  - Structured logging in providers
+- CI/CD:
+  - `.github/workflows/test.yml` - Automated testing
+  - `.github/workflows/lint.yml` - Code linting
+  - golangci-lint configuration
+- Code refactoring:
+  - `BaseProvider` with common functionality
+  - Registry interface (`RegistryInterface`)
+  - Reduced code duplication by ~15%
+
+#### Security
+- SHA256 checksum support for packages
+- Checksum verification (`VerifyChecksum`)
+- `checksum` field in package registry
+
+### Changed
+- Improved provider implementations:
+  - Extracted common patterns to `BaseProvider`
+  - Added logging to all provider operations
+  - Simplified BrewProvider and WinGetProvider
+- Enhanced config schema:
+  - Added `profiles` section
+  - Support for package version specs (`name@version`)
+- Version bumped to 0.1.2 in `cmd/root.go`
+
+### Fixed
+- Dependency resolution edge cases
+- Error propagation in command handlers
+
+### Internal
+- Registry interface for better testability
+- Improved error propagation
+- Code organization and documentation
+- 70%+ test coverage target (in progress)
 
 ---
 
+## [0.1.1] - 2026-02-07
+
+### Added
+- Dependency resolution with topological sort
+- Management commands: list, search, info, update, remove
+- index.yaml support for package search
+- Provider Remove() method
+
+### Removed
+- Custom registry support (UNIPM_REGISTRY_PATH, file:// URLs)
+
+---
+
+## [Unreleased]
+
+### Planned for v0.2
+- Test coverage 80%+
+- Concurrency improvements
+- Progress bar for installations
+- godoc documentation
+- More packages in registry (20 → 50+)
+
+---
+
+[0.1.2]: https://github.com/Litchi-group/unipm/releases/tag/v0.1.2
+[0.1.1]: https://github.com/Litchi-group/unipm/releases/tag/v0.1.1
 [0.1.0]: https://github.com/Litchi-group/unipm/releases/tag/v0.1.0
