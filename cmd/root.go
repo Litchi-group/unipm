@@ -4,7 +4,12 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Litchi-group/unipm/internal/logger"
 	"github.com/spf13/cobra"
+)
+
+var (
+	verbose bool
 )
 
 var rootCmd = &cobra.Command{
@@ -16,7 +21,12 @@ unipm orchestrates native package managers (Homebrew, WinGet, apt, snap)
 to provide a unified, declarative interface for cross-platform dev environment setup.
 
 Write once. Set up anywhere.`,
-	Version: "0.1.0",
+	Version: "0.1.2",
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		if verbose {
+			logger.SetLevel(logger.LevelDebug)
+		}
+	},
 }
 
 // Execute runs the root command
@@ -28,6 +38,6 @@ func Execute() {
 }
 
 func init() {
-	// Global flags can be added here
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.unipm.yaml)")
+	// Global flags
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
 }

@@ -32,3 +32,4 @@ Thumbs.db
 # Test files
 devpack.yaml
 dist/
+unipm-test
