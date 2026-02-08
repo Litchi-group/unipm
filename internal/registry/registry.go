@@ -30,6 +30,7 @@ type Package struct {
 	Homepage     string                       `yaml:"homepage"`
 	Dependencies []string                     `yaml:"dependencies,omitempty"`
 	Providers    map[string][]ProviderMapping `yaml:"providers"`
+	Checksum     string                       `yaml:"checksum,omitempty"` // SHA256 checksum
 }
 
 // ProviderMapping represents OS-specific provider configuration
