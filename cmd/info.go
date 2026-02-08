@@ -29,7 +29,7 @@ func runInfo(packageID string) error {
 	// Load package
 	pkg, err := reg.LoadPackage(packageID)
 	if err != nil {
-		return fmt.Errorf("failed to load package: %w", err)
+		return handleError(err)
 	}
 	
 	// Display information

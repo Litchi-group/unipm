@@ -42,7 +42,7 @@ func runApply() error {
 	// Load devpack.yaml
 	devpack, err := config.Load("devpack.yaml")
 	if err != nil {
-		return fmt.Errorf("failed to load devpack.yaml: %w", err)
+		return handleError(fmt.Errorf("failed to load devpack.yaml: %w", err))
 	}
 	
 	if len(devpack.Apps) == 0 {
@@ -60,7 +60,7 @@ func runApply() error {
 	// Create plan
 	plan, err := plnr.CreatePlan(devpack.Apps)
 	if err != nil {
-		return err
+		return handleError(err)
 	}
 	
 	// Show plan summary
