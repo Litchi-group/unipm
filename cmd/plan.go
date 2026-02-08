@@ -10,6 +10,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	planProfile string
+)
+
 var planCmd = &cobra.Command{
 	Use:   "plan",
 	Short: "Generate an installation plan from devpack.yaml",
@@ -24,6 +28,7 @@ This is a non-destructive operation that only displays the plan.`,
 
 func init() {
 	rootCmd.AddCommand(planCmd)
+	planCmd.Flags().StringVarP(&planProfile, "profile", "p", "", "Use a specific profile from devpack.yaml")
 }
 
 func runPlan() error {
@@ -33,9 +38,19 @@ func runPlan() error {
 		return handleError(fmt.Errorf("failed to load devpack.yaml: %w", err))
 	}
 	
-	if len(devpack.Apps) == 0 {
-		fmt.Println("No packages specified in devpack.yaml")
+	apps := devpack.GetApps(planProfile)
+	
+	if len(apps) == 0 {
+		if planProfile != "" {
+			fmt.Printf("Profile '%s' not found or empty in devpack.yaml\n", planProfile)
+		} else {
+			fmt.Println("No packages specified in devpack.yaml")
+		}
 		return nil
+	}
+	
+	if planProfile != "" {
+		fmt.Printf("Using profile: %s\n\n", planProfile)
 	}
 	
 	// Detect OS
@@ -46,7 +61,7 @@ func runPlan() error {
 	plnr := planner.NewPlanner(reg, osInfo)
 	
 	// Create plan
-	plan, err := plnr.CreatePlan(devpack.Apps)
+	plan, err := plnr.CreatePlan(apps)
 	if err != nil {
 		return handleError(err)
 	}
