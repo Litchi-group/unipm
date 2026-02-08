@@ -1,7 +1,7 @@
 package registry
 
 import (
-	"fmt"
+	"github.com/Litchi-group/unipm/internal/errors"
 )
 
 // DependencyResolver resolves package dependencies and returns installation order
@@ -21,6 +21,7 @@ func NewDependencyResolver(registry *Registry) *DependencyResolver {
 func (dr *DependencyResolver) Resolve(packageIDs []string) ([]string, error) {
 	visited := make(map[string]bool)
 	visiting := make(map[string]bool)
+	path := []string{}
 	result := []string{}
 	
 	var visit func(string) error
@@ -30,15 +31,33 @@ func (dr *DependencyResolver) Resolve(packageIDs []string) ([]string, error) {
 		}
 		
 		if visiting[pkgID] {
-			return fmt.Errorf("circular dependency detected: %s", pkgID)
+			// Found a cycle - build the cycle path
+			cycleStart := -1
+			for i, p := range path {
+				if p == pkgID {
+					cycleStart = i
+					break
+				}
+			}
+			
+			var cycle []string
+			if cycleStart >= 0 {
+				cycle = append(cycle, path[cycleStart:]...)
+				cycle = append(cycle, pkgID) // Close the cycle
+			} else {
+				cycle = []string{pkgID, pkgID}
+			}
+			
+			return errors.NewCircularDependencyError(cycle)
 		}
 		
 		visiting[pkgID] = true
+		path = append(path, pkgID)
 		
 		// Load package to check dependencies
 		pkg, err := dr.registry.LoadPackage(pkgID)
 		if err != nil {
-			return fmt.Errorf("failed to load package %s: %w", pkgID, err)
+			return errors.NewDependencyError(pkgID, "failed to load package", err)
 		}
 		
 		// Visit dependencies first
@@ -48,6 +67,7 @@ func (dr *DependencyResolver) Resolve(packageIDs []string) ([]string, error) {
 			}
 		}
 		
+		path = path[:len(path)-1]
 		visiting[pkgID] = false
 		visited[pkgID] = true
 		result = append(result, pkgID)

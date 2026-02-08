@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/Litchi-group/unipm/internal/errors"
 	"gopkg.in/yaml.v3"
 )
 
@@ -98,21 +99,21 @@ func (r *Registry) fetchPackage(packageID string) (*Package, error) {
 	
 	resp, err := r.client.Get(url)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch package %s: %w", packageID, err)
+		return nil, errors.NewNetworkError(url, "failed to fetch package", err)
 	}
 	defer resp.Body.Close()
 	
 	if resp.StatusCode == 404 {
-		return nil, fmt.Errorf("package not found: %s", packageID)
+		return nil, errors.NewNotFoundError(packageID)
 	}
 	
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("unexpected status code %d for package %s", resp.StatusCode, packageID)
+		return nil, errors.NewNetworkError(url, fmt.Sprintf("unexpected status code %d", resp.StatusCode), nil)
 	}
 	
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read response: %w", err)
+		return nil, errors.NewNetworkError(url, "failed to read response", err)
 	}
 	
 	var pkg Package
