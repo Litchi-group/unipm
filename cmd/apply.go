@@ -14,8 +14,9 @@ import (
 )
 
 var (
-	dryRun bool
-	yes    bool
+	dryRun  bool
+	yes     bool
+	profile string
 )
 
 var applyCmd = &cobra.Command{
@@ -36,6 +37,7 @@ func init() {
 	
 	applyCmd.Flags().BoolVar(&dryRun, "dry-run", false, "Show what would be done without executing")
 	applyCmd.Flags().BoolVarP(&yes, "yes", "y", false, "Skip confirmation prompt")
+	applyCmd.Flags().StringVarP(&profile, "profile", "p", "", "Use a specific profile from devpack.yaml")
 }
 
 func runApply() error {
@@ -45,9 +47,19 @@ func runApply() error {
 		return handleError(fmt.Errorf("failed to load devpack.yaml: %w", err))
 	}
 	
-	if len(devpack.Apps) == 0 {
-		fmt.Println("No packages specified in devpack.yaml")
+	apps := devpack.GetApps(profile)
+	
+	if len(apps) == 0 {
+		if profile != "" {
+			fmt.Printf("Profile '%s' not found or empty in devpack.yaml\n", profile)
+		} else {
+			fmt.Println("No packages specified in devpack.yaml")
+		}
 		return nil
+	}
+	
+	if profile != "" {
+		fmt.Printf("Using profile: %s\n\n", profile)
 	}
 	
 	// Detect OS
@@ -58,7 +70,7 @@ func runApply() error {
 	plnr := planner.NewPlanner(reg, osInfo)
 	
 	// Create plan
-	plan, err := plnr.CreatePlan(devpack.Apps)
+	plan, err := plnr.CreatePlan(apps)
 	if err != nil {
 		return handleError(err)
 	}
