@@ -24,6 +24,9 @@ type Provider interface {
 
 	// RemoveCommand returns the uninstall command
 	RemoveCommand(spec ProviderSpec) string
+
+	// ListInstalled returns a list of installed package names
+	ListInstalled() ([]string, error)
 }
 
 // ProviderSpec contains provider-specific package information
