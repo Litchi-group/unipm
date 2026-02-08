@@ -1,10 +1,6 @@
 package provider
 
-import (
-	"fmt"
-	"os/exec"
-	"strings"
-)
+import "fmt"
 
 // Provider defines the interface for package managers
 type Provider interface {
@@ -36,42 +32,6 @@ type ProviderSpec struct {
 	Name    string // Package name
 	ID      string // Package ID (for winget)
 	Classic bool   // Classic mode (for snap)
-}
-
-// BaseProvider provides common functionality for all providers
-type BaseProvider struct {
-	name       string
-	executable string
-}
-
-// Name returns the provider name
-func (p *BaseProvider) Name() string {
-	return p.name
-}
-
-// IsAvailable checks if the executable is in PATH
-func (p *BaseProvider) IsAvailable() bool {
-	_, err := exec.LookPath(p.executable)
-	return err == nil
-}
-
-// execCommand executes a command and returns the output
-func execCommand(name string, args ...string) (string, error) {
-	cmd := exec.Command(name, args...)
-	output, err := cmd.CombinedOutput()
-	return strings.TrimSpace(string(output)), err
-}
-
-// execCommandSilent executes a command and returns only the error
-func execCommandSilent(name string, args ...string) error {
-	cmd := exec.Command(name, args...)
-	return cmd.Run()
-}
-
-// FormatCommand formats a command for display
-func FormatCommand(name string, args ...string) string {
-	parts := append([]string{name}, args...)
-	return strings.Join(parts, " ")
 }
 
 // GetInstallationGuide returns installation instructions for missing providers
