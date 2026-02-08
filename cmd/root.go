@@ -16,7 +16,7 @@ unipm orchestrates native package managers (Homebrew, WinGet, apt, snap)
 to provide a unified, declarative interface for cross-platform dev environment setup.
 
 Write once. Set up anywhere.`,
-	Version: "0.1.0",
+	Version: "0.1.2",
 }
 
 // Execute runs the root command

@@ -38,13 +38,22 @@ vscode
 
 ---
 
-## 🚀 Features (v0.1)
+## 🚀 Features
 
+### v0.1.2 (Latest)
+- ✅ **Version management**: Specify versions (e.g., `node@18.x`, `python^3.10`)
+- ✅ **Profile system**: Define and use profiles (`--profile web`)
+- ✅ **Export/Import**: Export installed packages, import configurations
+- ✅ **Error handling**: User-friendly error messages
+- ✅ **Configuration**: `~/.unipm/config.yaml` for custom settings
+- ✅ **Logging**: `--verbose` flag for debug output
+- ✅ **Package management**: list, search, info, update, remove commands
+
+### v0.1.0-0.1.1
 - Cross-platform CLI (Windows / macOS / Linux)
 - Declarative YAML-based configuration
-- Installation plan preview (dry-run by default)
-- Optional execution of the plan
-- No server, no daemon, no runtime dependencies
+- Installation plan preview
+- Dependency resolution
 - Single static binary
 
 ---
