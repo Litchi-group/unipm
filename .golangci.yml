@@ -1,0 +1,31 @@
+linters-settings:
+  govet:
+    check-shadowing: true
+  gocyclo:
+    min-complexity: 15
+  misspell:
+    locale: US
+  lll:
+    line-length: 140
+
+linters:
+  enable:
+    - gofmt
+    - govet
+    - errcheck
+    - staticcheck
+    - unused
+    - gosimple
+    - structcheck
+    - varcheck
+    - ineffassign
+    - deadcode
+  disable:
+    - typecheck  # Often causes issues with mocks
+
+run:
+  timeout: 5m
+  tests: true
+
+issues:
+  exclude-use-default: false
