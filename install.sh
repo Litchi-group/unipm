@@ -109,6 +109,63 @@ if command -v unipm >/dev/null 2>&1; then
     echo "📍 Location: $(command -v unipm)"
     echo "📌 Version: $(unipm --version 2>/dev/null || echo 'unknown')"
     echo ""
+    
+    # Check package managers
+    echo "🔍 Checking system requirements..."
+    echo ""
+    
+    if [ "$OS" = "darwin" ]; then
+        if command -v brew >/dev/null 2>&1; then
+            echo "✅ Homebrew: $(brew --version | head -1)"
+        else
+            echo "❌ Homebrew: not installed"
+            echo ""
+            echo "⚠️  Homebrew is required for unipm on macOS"
+            echo "   Install it with:"
+            echo "   /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
+            echo ""
+            echo "   Or visit: https://brew.sh"
+        fi
+    elif [ "$OS" = "windows" ]; then
+        if command -v winget >/dev/null 2>&1; then
+            echo "✅ WinGet: installed"
+        else
+            echo "❌ WinGet: not installed"
+            echo ""
+            echo "⚠️  WinGet is required for unipm on Windows"
+            echo "   Install 'App Installer' from Microsoft Store"
+            echo "   Or visit: https://aka.ms/getwinget"
+        fi
+    elif [ "$OS" = "linux" ]; then
+        APT_OK=false
+        SNAP_OK=false
+        
+        if command -v apt >/dev/null 2>&1; then
+            echo "✅ APT: installed"
+            APT_OK=true
+        else
+            echo "⚠️  APT: not found (Debian/Ubuntu only)"
+        fi
+        
+        if command -v snap >/dev/null 2>&1; then
+            echo "✅ Snap: installed"
+            SNAP_OK=true
+        else
+            echo "❌ Snap: not installed"
+            if [ "$APT_OK" = true ]; then
+                echo "   Install with: sudo apt install snapd"
+            fi
+        fi
+        
+        if [ "$APT_OK" = false ] && [ "$SNAP_OK" = false ]; then
+            echo ""
+            echo "⚠️  No package managers found"
+            echo "   unipm requires APT or Snap on Linux"
+        fi
+    fi
+    
+    echo ""
+    echo "Run 'unipm doctor' for detailed system check"
     echo "Run 'unipm --help' to get started!"
 else
     echo "⚠️  unipm is installed but not in PATH"
