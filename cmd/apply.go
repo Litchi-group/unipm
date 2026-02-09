@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Litchi-group/unipm/internal/config"
 	"github.com/Litchi-group/unipm/internal/detector"
 	"github.com/Litchi-group/unipm/internal/planner"
 	"github.com/Litchi-group/unipm/internal/registry"
@@ -42,9 +41,12 @@ func init() {
 
 func runApply() error {
 	// Load devpack.yaml
-	devpack, err := config.Load("devpack.yaml")
+	devpack, err := loadDevpackWithPrompt()
 	if err != nil {
-		return handleError(fmt.Errorf("failed to load devpack.yaml: %w", err))
+		return handleError(err)
+	}
+	if devpack == nil {
+		return nil // File not found, already printed help message
 	}
 
 	apps := devpack.GetApps(profile)

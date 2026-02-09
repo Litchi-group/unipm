@@ -32,24 +32,30 @@ func init() {
 }
 
 func runRemove(packageIDs []string) error {
-	// Load devpack.yaml to verify packages
+	// Load devpack.yaml to verify packages (optional)
 	devpack, err := config.Load("devpack.yaml")
 	if err != nil {
-		return fmt.Errorf("failed to load devpack.yaml: %w", err)
-	}
-
-	// Check if packages are in devpack.yaml
-	for _, pkg := range packageIDs {
-		found := false
-		for _, devPkg := range devpack.Apps {
-			if devPkg == pkg {
-				found = true
-				break
+		// devpack.yaml is optional for remove command
+		if !os.IsNotExist(err) && !strings.Contains(err.Error(), "no such file or directory") {
+			return fmt.Errorf("failed to load devpack.yaml: %w", err)
+		}
+		fmt.Println("Note: No devpack.yaml found (not required for remove)")
+		fmt.Println()
+	} else {
+		// Check if packages are in devpack.yaml
+		for _, pkg := range packageIDs {
+			found := false
+			for _, devPkg := range devpack.Apps {
+				if devPkg == pkg {
+					found = true
+					break
+				}
+			}
+			if !found {
+				fmt.Printf("Warning: %s is not in devpack.yaml\n", pkg)
 			}
 		}
-		if !found {
-			fmt.Printf("Warning: %s is not in devpack.yaml\n", pkg)
-		}
+		fmt.Println()
 	}
 
 	// Detect OS

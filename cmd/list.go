@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/Litchi-group/unipm/internal/config"
 	"github.com/spf13/cobra"
 )
 
@@ -22,9 +21,12 @@ func init() {
 
 func runList() error {
 	// Load devpack.yaml
-	devpack, err := config.Load("devpack.yaml")
+	devpack, err := loadDevpackWithPrompt()
 	if err != nil {
-		return fmt.Errorf("failed to load devpack.yaml: %w", err)
+		return err
+	}
+	if devpack == nil {
+		return nil // File not found, already printed help message
 	}
 
 	if len(devpack.Apps) == 0 {
