@@ -38,6 +38,23 @@ vscode
 
 ---
 
+## 📦 Package Registry
+
+unipm provides a curated registry of **100+ popular development tools** across all major categories:
+
+- **IDEs & Editors**: VSCode, IntelliJ, PyCharm, Sublime Text, Neovim, Atom
+- **Programming Languages**: Node.js, Python, Go, Rust, Java, Ruby, PHP, .NET, Swift, Kotlin
+- **Databases**: PostgreSQL, MySQL, MongoDB, Redis, Cassandra, Neo4j, Elasticsearch
+- **DevOps Tools**: Docker, Kubernetes, Ansible, Terraform, Vagrant, Jenkins, GitLab Runner
+- **Cloud CLIs**: AWS CLI, Azure CLI, Google Cloud SDK, Heroku CLI
+- **Browsers**: Chrome, Firefox, Brave, Edge, Opera
+- **Build Tools**: Maven, Gradle, CMake, Bazel
+- **Utilities**: Git, Curl, Wget, FFmpeg, Postman, Slack, Discord
+
+View all available packages: [unipm-registry](https://github.com/Litchi-group/unipm-registry)
+
+---
+
 ## 🚀 Features
 
 ### v0.1.2 (Latest)
