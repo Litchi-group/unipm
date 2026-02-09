@@ -30,11 +30,11 @@ func execCommand(name string, args ...string) (string, error) {
 	logger.Debug("Executing: %s %s", name, strings.Join(args, " "))
 	cmd := exec.Command(name, args...)
 	output, err := cmd.CombinedOutput()
-	
+
 	if err != nil {
 		logger.Debug("Command failed: %v, output: %s", err, string(output))
 	}
-	
+
 	return strings.TrimSpace(string(output)), err
 }
 

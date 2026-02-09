@@ -23,13 +23,13 @@ func (dr *DependencyResolver) Resolve(packageIDs []string) ([]string, error) {
 	visiting := make(map[string]bool)
 	path := []string{}
 	result := []string{}
-	
+
 	var visit func(string) error
 	visit = func(pkgID string) error {
 		if visited[pkgID] {
 			return nil
 		}
-		
+
 		if visiting[pkgID] {
 			// Found a cycle - build the cycle path
 			cycleStart := -1
@@ -39,7 +39,7 @@ func (dr *DependencyResolver) Resolve(packageIDs []string) ([]string, error) {
 					break
 				}
 			}
-			
+
 			var cycle []string
 			if cycleStart >= 0 {
 				cycle = append(cycle, path[cycleStart:]...)
@@ -47,41 +47,41 @@ func (dr *DependencyResolver) Resolve(packageIDs []string) ([]string, error) {
 			} else {
 				cycle = []string{pkgID, pkgID}
 			}
-			
+
 			return errors.NewCircularDependencyError(cycle)
 		}
-		
+
 		visiting[pkgID] = true
 		path = append(path, pkgID)
-		
+
 		// Load package to check dependencies
 		pkg, err := dr.registry.LoadPackage(pkgID)
 		if err != nil {
 			return errors.NewDependencyError(pkgID, "failed to load package", err)
 		}
-		
+
 		// Visit dependencies first
 		for _, depID := range pkg.Dependencies {
 			if err := visit(depID); err != nil {
 				return err
 			}
 		}
-		
+
 		path = path[:len(path)-1]
 		visiting[pkgID] = false
 		visited[pkgID] = true
 		result = append(result, pkgID)
-		
+
 		return nil
 	}
-	
+
 	// Visit all requested packages
 	for _, pkgID := range packageIDs {
 		if err := visit(pkgID); err != nil {
 			return nil, err
 		}
 	}
-	
+
 	return result, nil
 }
 
@@ -89,35 +89,35 @@ func (dr *DependencyResolver) Resolve(packageIDs []string) ([]string, error) {
 func (dr *DependencyResolver) GetDependencyTree(packageIDs []string) (map[string][]string, error) {
 	tree := make(map[string][]string)
 	visited := make(map[string]bool)
-	
+
 	var visit func(string) error
 	visit = func(pkgID string) error {
 		if visited[pkgID] {
 			return nil
 		}
 		visited[pkgID] = true
-		
+
 		pkg, err := dr.registry.LoadPackage(pkgID)
 		if err != nil {
 			return err
 		}
-		
+
 		tree[pkgID] = pkg.Dependencies
-		
+
 		for _, depID := range pkg.Dependencies {
 			if err := visit(depID); err != nil {
 				return err
 			}
 		}
-		
+
 		return nil
 	}
-	
+
 	for _, pkgID := range packageIDs {
 		if err := visit(pkgID); err != nil {
 			return nil, err
 		}
 	}
-	
+
 	return tree, nil
 }

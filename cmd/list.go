@@ -26,17 +26,17 @@ func runList() error {
 	if err != nil {
 		return fmt.Errorf("failed to load devpack.yaml: %w", err)
 	}
-	
+
 	if len(devpack.Apps) == 0 {
 		fmt.Println("No packages defined in devpack.yaml")
 		return nil
 	}
-	
+
 	fmt.Printf("Packages in devpack.yaml (%d):\n\n", len(devpack.Apps))
-	
+
 	for i, pkg := range devpack.Apps {
 		fmt.Printf("  %d. %s\n", i+1, pkg)
 	}
-	
+
 	return nil
 }

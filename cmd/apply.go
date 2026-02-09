@@ -34,7 +34,7 @@ Use --yes to skip confirmation.`,
 
 func init() {
 	rootCmd.AddCommand(applyCmd)
-	
+
 	applyCmd.Flags().BoolVar(&dryRun, "dry-run", false, "Show what would be done without executing")
 	applyCmd.Flags().BoolVarP(&yes, "yes", "y", false, "Skip confirmation prompt")
 	applyCmd.Flags().StringVarP(&profile, "profile", "p", "", "Use a specific profile from devpack.yaml")
@@ -46,9 +46,9 @@ func runApply() error {
 	if err != nil {
 		return handleError(fmt.Errorf("failed to load devpack.yaml: %w", err))
 	}
-	
+
 	apps := devpack.GetApps(profile)
-	
+
 	if len(apps) == 0 {
 		if profile != "" {
 			fmt.Printf("Profile '%s' not found or empty in devpack.yaml\n", profile)
@@ -57,27 +57,27 @@ func runApply() error {
 		}
 		return nil
 	}
-	
+
 	if profile != "" {
 		fmt.Printf("Using profile: %s\n\n", profile)
 	}
-	
+
 	// Detect OS
 	osInfo := detector.DetectOS()
-	
+
 	// Create planner
 	reg := registry.NewRegistry()
 	plnr := planner.NewPlanner(reg, osInfo)
-	
+
 	// Create plan
 	plan, err := plnr.CreatePlan(apps)
 	if err != nil {
 		return handleError(err)
 	}
-	
+
 	// Show plan summary
 	fmt.Printf("Plan for %s:\n\n", osInfo.String())
-	
+
 	newInstalls := 0
 	for _, task := range plan.Tasks {
 		if !task.Installed {
@@ -87,38 +87,38 @@ func runApply() error {
 			fmt.Printf("  %s (already installed)\n", task.PackageID)
 		}
 	}
-	
+
 	fmt.Println()
-	
+
 	if newInstalls == 0 {
 		fmt.Println("All packages are already installed.")
 		return nil
 	}
-	
+
 	// Prompt for confirmation unless --yes or --dry-run
 	if !dryRun && !yes {
 		fmt.Printf("Do you want to proceed with installing %d package(s)? [y/N]: ", newInstalls)
-		
+
 		reader := bufio.NewReader(os.Stdin)
 		response, err := reader.ReadString('\n')
 		if err != nil {
 			return fmt.Errorf("failed to read input: %w", err)
 		}
-		
+
 		response = strings.ToLower(strings.TrimSpace(response))
 		if response != "y" && response != "yes" {
 			fmt.Println("Cancelled.")
 			return nil
 		}
-		
+
 		fmt.Println()
 	}
-	
+
 	// Execute plan
 	if dryRun {
 		fmt.Println("Dry run mode enabled. Nothing will be executed.")
 		fmt.Println()
 	}
-	
+
 	return plan.Execute(dryRun)
 }

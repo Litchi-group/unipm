@@ -19,7 +19,7 @@ This is an alias for 'unipm apply' and accepts the same flags.`,
 
 func init() {
 	rootCmd.AddCommand(importCmd)
-	
+
 	// Share flags with apply
 	importCmd.Flags().BoolVar(&dryRun, "dry-run", false, "Show what would be done without executing")
 	importCmd.Flags().BoolVarP(&yes, "yes", "y", false, "Skip confirmation prompt")

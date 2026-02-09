@@ -30,35 +30,35 @@ func runUpdate(packageIDs []string) error {
 	if err != nil {
 		return fmt.Errorf("failed to load devpack.yaml: %w", err)
 	}
-	
+
 	// If no packages specified, update all
 	if len(packageIDs) == 0 {
 		packageIDs = devpack.Apps
 	}
-	
+
 	if len(packageIDs) == 0 {
 		fmt.Println("No packages to update")
 		return nil
 	}
-	
+
 	// Detect OS
 	osInfo := detector.DetectOS()
-	
+
 	// Create planner
 	reg := registry.NewRegistry()
 	plnr := planner.NewPlanner(reg, osInfo)
-	
+
 	// Create plan
 	plan, err := plnr.CreatePlan(packageIDs)
 	if err != nil {
 		return err
 	}
-	
+
 	fmt.Printf("Updating %d package(s)...\n\n", len(plan.Tasks))
-	
+
 	updatedCount := 0
 	notInstalledCount := 0
-	
+
 	for _, task := range plan.Tasks {
 		if !task.Installed {
 			fmt.Printf("Updating %s...\n", task.PackageID)
@@ -66,21 +66,21 @@ func runUpdate(packageIDs []string) error {
 			notInstalledCount++
 			continue
 		}
-		
+
 		fmt.Printf("Updating %s...\n", task.PackageID)
-		
+
 		// Get update command (same as install for most package managers)
 		// They handle updates when package is already installed
 		if err := task.Provider.Install(*task.Spec); err != nil {
 			return fmt.Errorf("failed to update %s: %w", task.PackageID, err)
 		}
-		
+
 		fmt.Printf("  ✓ Updated\n")
 		updatedCount++
 	}
-	
+
 	fmt.Println()
 	fmt.Printf("Done! %d updated, %d not installed.\n", updatedCount, notInstalledCount)
-	
+
 	return nil
 }

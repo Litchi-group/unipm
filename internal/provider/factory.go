@@ -9,7 +9,7 @@ import (
 // GetProvidersForOS returns available providers for the given OS
 func GetProvidersForOS(osInfo *detector.OSInfo) []Provider {
 	var providers []Provider
-	
+
 	switch {
 	case osInfo.IsMacOS():
 		providers = []Provider{
@@ -25,7 +25,7 @@ func GetProvidersForOS(osInfo *detector.OSInfo) []Provider {
 			NewSnapProvider(),
 		}
 	}
-	
+
 	return providers
 }
 

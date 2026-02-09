@@ -24,19 +24,19 @@ type Plan struct {
 
 // Planner generates installation plans
 type Planner struct {
-	registry  *registry.Registry
-	resolver  *registry.Resolver
+	registry    *registry.Registry
+	resolver    *registry.Resolver
 	depResolver *registry.DependencyResolver
-	osInfo    *detector.OSInfo
+	osInfo      *detector.OSInfo
 }
 
 // NewPlanner creates a new Planner
 func NewPlanner(reg *registry.Registry, osInfo *detector.OSInfo) *Planner {
 	return &Planner{
-		registry:  reg,
-		resolver:  registry.NewResolver(reg, osInfo),
+		registry:    reg,
+		resolver:    registry.NewResolver(reg, osInfo),
 		depResolver: registry.NewDependencyResolver(reg),
-		osInfo:    osInfo,
+		osInfo:      osInfo,
 	}
 }
 
@@ -48,43 +48,43 @@ func (p *Planner) CreatePlan(packageIDs []string) (*Plan, error) {
 	if err != nil {
 		return nil, fmt.Errorf("dependency resolution failed: %w", err)
 	}
-	
+
 	plan := &Plan{
 		Tasks:  make([]*InstallTask, 0, len(orderedIDs)),
 		OSInfo: p.osInfo,
 	}
-	
+
 	for _, packageID := range orderedIDs {
 		// Resolve package to provider spec
 		spec, err := p.resolver.Resolve(packageID)
 		if err != nil {
 			return nil, fmt.Errorf("failed to resolve %s: %w", packageID, err)
 		}
-		
+
 		// Get provider instance
 		prov, err := provider.GetProviderByType(spec.Type)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get provider for %s: %w", packageID, err)
 		}
-		
+
 		// Check if provider is available
 		if !prov.IsAvailable() {
 			return nil, fmt.Errorf("provider %s is not available for %s", prov.Name(), packageID)
 		}
-		
+
 		// Check if already installed
 		installed := prov.IsInstalled(*spec)
-		
+
 		task := &InstallTask{
 			PackageID: packageID,
 			Spec:      spec,
 			Provider:  prov,
 			Installed: installed,
 		}
-		
+
 		plan.Tasks = append(plan.Tasks, task)
 	}
-	
+
 	return plan, nil
 }
 
@@ -92,7 +92,7 @@ func (p *Planner) CreatePlan(packageIDs []string) (*Plan, error) {
 func (plan *Plan) Execute(dryRun bool) error {
 	installedCount := 0
 	skippedCount := 0
-	
+
 	for _, task := range plan.Tasks {
 		if task.Installed {
 			fmt.Printf("Installing %s...\n", task.PackageID)
@@ -100,39 +100,39 @@ func (plan *Plan) Execute(dryRun bool) error {
 			skippedCount++
 			continue
 		}
-		
+
 		fmt.Printf("Installing %s...\n", task.PackageID)
-		
+
 		if dryRun {
 			fmt.Printf("  [dry-run] %s\n", task.Provider.InstallCommand(*task.Spec))
 			installedCount++
 			continue
 		}
-		
+
 		// Execute installation
 		if err := task.Provider.Install(*task.Spec); err != nil {
 			return fmt.Errorf("failed to install %s: %w", task.PackageID, err)
 		}
-		
+
 		fmt.Printf("  ✓ Installed\n")
 		installedCount++
 	}
-	
+
 	fmt.Println()
-	
+
 	if dryRun {
 		fmt.Printf("Dry run complete. Would install %d, skip %d.\n", installedCount, skippedCount)
 	} else {
 		fmt.Printf("Done! %d installed, %d skipped.\n", installedCount, skippedCount)
 	}
-	
+
 	return nil
 }
 
 // Print prints the plan without executing
 func (plan *Plan) Print() {
 	fmt.Printf("Plan for %s:\n\n", plan.OSInfo.String())
-	
+
 	for _, task := range plan.Tasks {
 		cmd := task.Provider.InstallCommand(*task.Spec)
 		status := ""
@@ -141,7 +141,7 @@ func (plan *Plan) Print() {
 		}
 		fmt.Printf("  %s → %s%s\n", task.PackageID, cmd, status)
 	}
-	
+
 	fmt.Println()
 	fmt.Println("To apply this plan, run 'unipm apply'.")
 }

@@ -44,17 +44,17 @@ func GetInstallationGuide(providerName string) string {
 Install it from: https://brew.sh
 
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`,
-		
+
 		"winget": `WinGet is not installed.
 Install it from: https://aka.ms/getwinget
 
 WinGet comes pre-installed on Windows 11 and recent Windows 10 builds.
 If missing, install "App Installer" from the Microsoft Store.`,
-		
+
 		"apt": `APT is not installed.
 APT comes pre-installed on Debian-based systems (Ubuntu, Debian).
 If you're not on a Debian-based system, unipm may not support your distribution yet.`,
-		
+
 		"snap": `Snap is not installed.
 Install it with:
 

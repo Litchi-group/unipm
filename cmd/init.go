@@ -29,7 +29,7 @@ func runInit() error {
 `
 
 	filename := "devpack.yaml"
-	
+
 	// Check if file already exists
 	if _, err := os.Stat(filename); err == nil {
 		return fmt.Errorf("%s already exists", filename)
@@ -42,6 +42,6 @@ func runInit() error {
 
 	fmt.Printf("✓ Created %s\n", filename)
 	fmt.Println("Edit the file and run 'unipm plan' to preview.")
-	
+
 	return nil
 }

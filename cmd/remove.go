@@ -37,7 +37,7 @@ func runRemove(packageIDs []string) error {
 	if err != nil {
 		return fmt.Errorf("failed to load devpack.yaml: %w", err)
 	}
-	
+
 	// Check if packages are in devpack.yaml
 	for _, pkg := range packageIDs {
 		found := false
@@ -51,22 +51,22 @@ func runRemove(packageIDs []string) error {
 			fmt.Printf("Warning: %s is not in devpack.yaml\n", pkg)
 		}
 	}
-	
+
 	// Detect OS
 	osInfo := detector.DetectOS()
-	
+
 	// Create planner
 	reg := registry.NewRegistry()
 	plnr := planner.NewPlanner(reg, osInfo)
-	
+
 	// Create plan
 	plan, err := plnr.CreatePlan(packageIDs)
 	if err != nil {
 		return err
 	}
-	
+
 	fmt.Printf("Packages to remove:\n\n")
-	
+
 	toRemove := 0
 	for _, task := range plan.Tasks {
 		if task.Installed {
@@ -76,37 +76,37 @@ func runRemove(packageIDs []string) error {
 			fmt.Printf("  %s (not installed)\n", task.PackageID)
 		}
 	}
-	
+
 	fmt.Println()
-	
+
 	if toRemove == 0 {
 		fmt.Println("No packages to remove.")
 		return nil
 	}
-	
+
 	// Prompt for confirmation unless --yes
 	if !removeYes {
 		fmt.Printf("Do you want to proceed with removing %d package(s)? [y/N]: ", toRemove)
-		
+
 		reader := bufio.NewReader(os.Stdin)
 		response, err := reader.ReadString('\n')
 		if err != nil {
 			return fmt.Errorf("failed to read input: %w", err)
 		}
-		
+
 		response = strings.ToLower(strings.TrimSpace(response))
 		if response != "y" && response != "yes" {
 			fmt.Println("Cancelled.")
 			return nil
 		}
-		
+
 		fmt.Println()
 	}
-	
+
 	// Execute removals
 	removedCount := 0
 	notInstalledCount := 0
-	
+
 	for _, task := range plan.Tasks {
 		if !task.Installed {
 			fmt.Printf("Removing %s...\n", task.PackageID)
@@ -114,19 +114,19 @@ func runRemove(packageIDs []string) error {
 			notInstalledCount++
 			continue
 		}
-		
+
 		fmt.Printf("Removing %s...\n", task.PackageID)
-		
+
 		if err := task.Provider.Remove(*task.Spec); err != nil {
 			return fmt.Errorf("failed to remove %s: %w", task.PackageID, err)
 		}
-		
+
 		fmt.Printf("  ✓ Removed\n")
 		removedCount++
 	}
-	
+
 	fmt.Println()
 	fmt.Printf("Done! %d removed, %d not installed.\n", removedCount, notInstalledCount)
-	
+
 	return nil
 }

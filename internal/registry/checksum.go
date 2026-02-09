@@ -15,17 +15,17 @@ func VerifyChecksum(data []byte, pkg *Package) bool {
 		logger.Debug("No checksum provided for package %s, skipping verification", pkg.ID)
 		return true
 	}
-	
+
 	// Calculate checksum of the data (excluding the checksum field itself)
 	calculatedChecksum := calculatePackageChecksum(data)
-	
+
 	// Compare checksums
 	if calculatedChecksum != pkg.Checksum {
-		logger.Warn("Checksum mismatch for package %s: expected %s, got %s", 
+		logger.Warn("Checksum mismatch for package %s: expected %s, got %s",
 			pkg.ID, pkg.Checksum, calculatedChecksum)
 		return false
 	}
-	
+
 	logger.Debug("Checksum verified for package %s", pkg.ID)
 	return true
 }
@@ -38,16 +38,16 @@ func calculatePackageChecksum(data []byte) string {
 		// If parsing fails, calculate checksum of raw data
 		return calculateRawChecksum(data)
 	}
-	
+
 	// Remove checksum field
 	pkg.Checksum = ""
-	
+
 	// Marshal back to YAML
 	cleanData, err := yaml.Marshal(&pkg)
 	if err != nil {
 		return calculateRawChecksum(data)
 	}
-	
+
 	return calculateRawChecksum(cleanData)
 }
 

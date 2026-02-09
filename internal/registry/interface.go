@@ -4,7 +4,7 @@ package registry
 type RegistryInterface interface {
 	// LoadPackage loads a package definition by ID
 	LoadPackage(packageID string) (*Package, error)
-	
+
 	// LoadIndex loads the package index
 	LoadIndex() ([]PackageInfo, error)
 }

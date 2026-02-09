@@ -35,7 +35,7 @@ func (p *WinGetProvider) Install(spec ProviderSpec) error {
 func (p *WinGetProvider) IsInstalled(spec ProviderSpec) bool {
 	packageID := p.getPackageID(spec)
 	args := []string{"list", "--id", packageID}
-	
+
 	output, err := execCommand("winget", args...)
 	return err == nil && strings.Contains(strings.ToLower(output), strings.ToLower(packageID))
 }

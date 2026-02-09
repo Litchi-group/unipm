@@ -45,29 +45,29 @@ func LoadGlobalConfig() (*GlobalConfig, error) {
 		logger.Warn("Failed to get home directory: %v", err)
 		return DefaultGlobalConfig(), nil
 	}
-	
+
 	configPath := filepath.Join(homeDir, ".unipm", "config.yaml")
-	
+
 	// If config file doesn't exist, return default
-	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+	if _, statErr := os.Stat(configPath); os.IsNotExist(statErr) {
 		logger.Debug("Config file not found, using defaults: %s", configPath)
 		return DefaultGlobalConfig(), nil
 	}
-	
+
 	// Read config file
 	data, err := os.ReadFile(configPath)
 	if err != nil {
 		logger.Warn("Failed to read config file: %v", err)
 		return DefaultGlobalConfig(), nil
 	}
-	
+
 	// Parse YAML
 	var config GlobalConfig
 	if err := yaml.Unmarshal(data, &config); err != nil {
 		logger.Warn("Failed to parse config file: %v", err)
 		return DefaultGlobalConfig(), nil
 	}
-	
+
 	// Apply defaults for missing fields
 	if config.Registry.URL == "" {
 		config.Registry.URL = DefaultGlobalConfig().Registry.URL
@@ -78,7 +78,7 @@ func LoadGlobalConfig() (*GlobalConfig, error) {
 	if config.Log.Level == "" {
 		config.Log.Level = DefaultGlobalConfig().Log.Level
 	}
-	
+
 	logger.Debug("Loaded config from %s", configPath)
 	return &config, nil
 }
@@ -89,18 +89,18 @@ func (c *GlobalConfig) Save() error {
 	if err != nil {
 		return err
 	}
-	
+
 	configDir := filepath.Join(homeDir, ".unipm")
-	if err := os.MkdirAll(configDir, 0755); err != nil {
-		return err
+	if mkdirErr := os.MkdirAll(configDir, 0755); mkdirErr != nil {
+		return mkdirErr
 	}
-	
+
 	configPath := filepath.Join(configDir, "config.yaml")
-	
+
 	data, err := yaml.Marshal(c)
 	if err != nil {
 		return err
 	}
-	
+
 	return os.WriteFile(configPath, data, 0644)
 }

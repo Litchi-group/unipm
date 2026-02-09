@@ -23,12 +23,12 @@ func (m *MockRegistry) LoadPackage(packageID string) (*Package, error) {
 	if m.LoadError != nil {
 		return nil, m.LoadError
 	}
-	
+
 	pkg, ok := m.Packages[packageID]
 	if !ok {
 		return nil, fmt.Errorf("package %s not found", packageID)
 	}
-	
+
 	return pkg, nil
 }
 
@@ -37,7 +37,7 @@ func (m *MockRegistry) LoadIndex() ([]PackageInfo, error) {
 	if m.IndexError != nil {
 		return nil, m.IndexError
 	}
-	
+
 	return m.IndexPackages, nil
 }
 

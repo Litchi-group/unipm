@@ -25,21 +25,21 @@ func init() {
 
 func runInfo(packageID string) error {
 	reg := registry.NewRegistry()
-	
+
 	// Load package
 	pkg, err := reg.LoadPackage(packageID)
 	if err != nil {
 		return handleError(err)
 	}
-	
+
 	// Display information
 	fmt.Printf("Package: %s\n", pkg.Name)
 	fmt.Printf("ID: %s\n", pkg.ID)
-	
+
 	if pkg.Homepage != "" {
 		fmt.Printf("Homepage: %s\n", pkg.Homepage)
 	}
-	
+
 	// Dependencies
 	if len(pkg.Dependencies) > 0 {
 		fmt.Printf("\nDependencies:\n")
@@ -47,23 +47,23 @@ func runInfo(packageID string) error {
 			fmt.Printf("  - %s\n", dep)
 		}
 	}
-	
+
 	// Providers
 	fmt.Printf("\nProviders:\n")
-	
+
 	osInfo := detector.DetectOS()
-	
+
 	for osKey, providers := range pkg.Providers {
 		fmt.Printf("  %s:\n", osKey)
 		for _, p := range providers {
 			fmt.Printf("    - %s: %s\n", p.Type, p.Name)
-			
+
 			// Highlight if this is the current OS
 			if strings.Contains(osInfo.String(), osKey) {
 				fmt.Printf("      (available on your system)\n")
 			}
 		}
 	}
-	
+
 	return nil
 }

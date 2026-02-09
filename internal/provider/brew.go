@@ -24,11 +24,11 @@ func (p *BrewProvider) Install(spec ProviderSpec) error {
 // IsInstalled checks if a package is installed
 func (p *BrewProvider) IsInstalled(spec ProviderSpec) bool {
 	args := []string{"list"}
-	
+
 	if spec.Type == "brew_cask" {
 		args = append(args, "--cask")
 	}
-	
+
 	args = append(args, spec.Name)
 	return p.checkInstalled(args...)
 }
@@ -36,11 +36,11 @@ func (p *BrewProvider) IsInstalled(spec ProviderSpec) bool {
 // buildInstallArgs builds installation arguments
 func (p *BrewProvider) buildInstallArgs(spec ProviderSpec) []string {
 	args := []string{"install"}
-	
+
 	if spec.Type == "brew_cask" {
 		args = append(args, "--cask")
 	}
-	
+
 	return append(args, spec.Name)
 }
 
@@ -65,10 +65,10 @@ func (p *BrewProvider) RemoveCommand(spec ProviderSpec) string {
 // buildRemoveArgs builds removal arguments
 func (p *BrewProvider) buildRemoveArgs(spec ProviderSpec) []string {
 	args := []string{"uninstall"}
-	
+
 	if spec.Type == "brew_cask" {
 		args = append(args, "--cask")
 	}
-	
+
 	return append(args, spec.Name)
 }

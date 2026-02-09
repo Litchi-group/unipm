@@ -33,7 +33,7 @@ func detectLinuxDistro() string {
 	// Try /etc/os-release (most modern distros)
 	if data, err := os.ReadFile("/etc/os-release"); err == nil {
 		content := string(data)
-		
+
 		// Look for ID= line
 		for _, line := range strings.Split(content, "\n") {
 			if strings.HasPrefix(line, "ID=") {
@@ -47,7 +47,7 @@ func detectLinuxDistro() string {
 	// Try /etc/lsb-release (older Ubuntu/Debian)
 	if data, err := os.ReadFile("/etc/lsb-release"); err == nil {
 		content := string(data)
-		
+
 		for _, line := range strings.Split(content, "\n") {
 			if strings.HasPrefix(line, "DISTRIB_ID=") {
 				distro := strings.TrimPrefix(line, "DISTRIB_ID=")

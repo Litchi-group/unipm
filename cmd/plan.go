@@ -37,9 +37,9 @@ func runPlan() error {
 	if err != nil {
 		return handleError(fmt.Errorf("failed to load devpack.yaml: %w", err))
 	}
-	
+
 	apps := devpack.GetApps(planProfile)
-	
+
 	if len(apps) == 0 {
 		if planProfile != "" {
 			fmt.Printf("Profile '%s' not found or empty in devpack.yaml\n", planProfile)
@@ -48,26 +48,26 @@ func runPlan() error {
 		}
 		return nil
 	}
-	
+
 	if planProfile != "" {
 		fmt.Printf("Using profile: %s\n\n", planProfile)
 	}
-	
+
 	// Detect OS
 	osInfo := detector.DetectOS()
-	
+
 	// Create planner
 	reg := registry.NewRegistry()
 	plnr := planner.NewPlanner(reg, osInfo)
-	
+
 	// Create plan
 	plan, err := plnr.CreatePlan(apps)
 	if err != nil {
 		return handleError(err)
 	}
-	
+
 	// Print plan
 	plan.Print()
-	
+
 	return nil
 }

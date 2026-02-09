@@ -25,14 +25,14 @@ func init() {
 func runDoctor() error {
 	// Detect OS
 	osInfo := detector.DetectOS()
-	
+
 	fmt.Printf("OS: %s\n", osInfo.String())
 	fmt.Printf("Architecture: %s\n", osInfo.Arch)
 	fmt.Println()
-	
+
 	// Check providers based on OS
 	var providers []provider.Provider
-	
+
 	switch {
 	case osInfo.IsMacOS():
 		providers = []provider.Provider{
@@ -48,7 +48,7 @@ func runDoctor() error {
 			provider.NewSnapProvider(),
 		}
 	}
-	
+
 	// Check each provider
 	allAvailable := true
 	for _, p := range providers {
@@ -59,15 +59,15 @@ func runDoctor() error {
 			allAvailable = false
 		}
 	}
-	
+
 	fmt.Println()
-	
+
 	if allAvailable {
 		fmt.Println("All required tools are available.")
 	} else {
 		fmt.Println("Some required tools are missing.")
 		fmt.Println()
-		
+
 		// Show installation guides for missing tools
 		for _, p := range providers {
 			if !p.IsAvailable() {
@@ -76,6 +76,6 @@ func runDoctor() error {
 			}
 		}
 	}
-	
+
 	return nil
 }

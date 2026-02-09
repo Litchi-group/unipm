@@ -19,11 +19,11 @@ const (
 
 // Logger is a structured logger
 type Logger struct {
-	level  Level
-	debug  *log.Logger
-	info   *log.Logger
-	warn   *log.Logger
-	error  *log.Logger
+	level Level
+	debug *log.Logger
+	info  *log.Logger
+	warn  *log.Logger
+	error *log.Logger
 }
 
 var defaultLogger *Logger
@@ -46,28 +46,28 @@ func New(w io.Writer, level Level) *Logger {
 // Debug logs a debug message
 func (l *Logger) Debug(format string, v ...interface{}) {
 	if l.level <= LevelDebug {
-		l.debug.Output(2, fmt.Sprintf(format, v...))
+		_ = l.debug.Output(2, fmt.Sprintf(format, v...))
 	}
 }
 
 // Info logs an info message
 func (l *Logger) Info(format string, v ...interface{}) {
 	if l.level <= LevelInfo {
-		l.info.Output(2, fmt.Sprintf(format, v...))
+		_ = l.info.Output(2, fmt.Sprintf(format, v...))
 	}
 }
 
 // Warn logs a warning message
 func (l *Logger) Warn(format string, v ...interface{}) {
 	if l.level <= LevelWarn {
-		l.warn.Output(2, fmt.Sprintf(format, v...))
+		_ = l.warn.Output(2, fmt.Sprintf(format, v...))
 	}
 }
 
 // Error logs an error message
 func (l *Logger) Error(format string, v ...interface{}) {
 	if l.level <= LevelError {
-		l.error.Output(2, fmt.Sprintf(format, v...))
+		_ = l.error.Output(2, fmt.Sprintf(format, v...))
 	}
 }
 
