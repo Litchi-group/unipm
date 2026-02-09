@@ -1,6 +1,7 @@
 linters-settings:
   govet:
-    check-shadowing: true
+    enable:
+      - shadow
   gocyclo:
     min-complexity: 15
   misspell:
@@ -16,10 +17,7 @@ linters:
     - staticcheck
     - unused
     - gosimple
-    - structcheck
-    - varcheck
     - ineffassign
-    - deadcode
   disable:
     - typecheck  # Often causes issues with mocks
 
