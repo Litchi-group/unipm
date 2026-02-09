@@ -190,6 +190,71 @@ First public release of unipm - Universal package manager orchestrator.
 
 ---
 
+## [0.1.3] - 2026-02-09
+
+### Added
+
+#### Universal Installer
+- **One-line installer script** (`install.sh`) for all platforms
+  - Automatic OS detection (macOS/Linux/Windows)
+  - Automatic architecture detection (amd64/arm64)
+  - Automatic package manager verification
+  - Shows installation guide if package managers are missing
+  - Usage: `curl -fsSL https://raw.githubusercontent.com/Litchi-group/unipm/main/install.sh | bash`
+
+#### Package Registry Expansion
+- **100+ packages** in registry (expanded from 20)
+- New categories added:
+  - **IDEs & Editors** (10): IntelliJ IDEA, PyCharm, Android Studio, Sublime Text, Atom, Neovim, Emacs, Xcode, Notepad++
+  - **Programming Languages** (15): Java, Ruby, PHP, .NET, Elixir, Haskell, Scala, Kotlin, Swift, Perl, Lua, Deno, Bun, Zig, R
+  - **Databases** (10): MySQL, MariaDB, MongoDB, SQLite, Cassandra, InfluxDB, Neo4j, Elasticsearch, CouchDB, Memcached
+  - **DevOps Tools** (15): Ansible, Vagrant, Packer, Vault, Consul, Nomad, Prometheus, Grafana, Nginx, Apache, Jenkins, GitLab Runner, Helm, Minikube, kind
+  - **Cloud CLIs** (8): AWS CLI, Azure CLI, Google Cloud SDK, Heroku CLI, doctl, GitHub CLI, GitLab CLI, Vercel CLI
+  - **Browsers** (5): Chrome, Firefox, Brave, Edge, Opera
+  - **Build Tools** (7): Maven, Gradle, CMake, Make, Bazel, Meson, SCons
+  - **Utilities** (10+): FFmpeg, ImageMagick, Pandoc, Graphviz, Wireshark, VLC, OBS Studio, GIMP, Inkscape, Blender
+  - **Productivity** (8): Postman, Insomnia, Slack, Discord, Zoom, Notion, Obsidian, 1Password, Bitwarden
+
+#### Enhanced User Experience
+- **Friendly error messages** when `devpack.yaml` not found
+  - Shows helpful guide to run `unipm init`
+  - Applied to: `list`, `plan`, `apply`, `update` commands
+  - `remove` command works without devpack.yaml
+- **Improved `unipm doctor`**:
+  - Beautiful formatted output with emojis
+  - Automatic package manager detection
+  - Installation guides for missing tools
+  - Linux-friendly (APT or Snap, not both required)
+  - Clear success/failure status with actionable next steps
+
+### Fixed
+
+#### CI/CD
+- Go version unified to **1.24** across all workflows
+- Fixed Windows test failures (PowerShell argument parsing)
+  - Changed `coverage.out` → `coverage.txt`
+  - Added `shell: bash` for cross-platform consistency
+- Removed deprecated golangci-lint linters:
+  - `structcheck`, `varcheck`, `deadcode` → replaced by `unused`
+- Modernized govet configuration (`check-shadowing` → `enable: [shadow]`)
+
+#### Installation
+- Fixed permission issues in README install commands
+  - Download to `/tmp` first, then `sudo mv`
+  - Prevents "Permission denied" errors
+
+### Changed
+- README updated with package registry showcase
+- Installation instructions improved with one-liner
+- All code formatted with `gofmt`
+- Error handling improvements (errcheck, shadow variables)
+
+### Internal
+- CI/CD now passing on all platforms (macOS, Linux, Windows)
+- Code quality improvements (all lint checks passing)
+
+---
+
 ## [Unreleased]
 
 ### Planned for v0.2
