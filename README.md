@@ -77,7 +77,23 @@ View all available packages: [unipm-registry](https://github.com/Litchi-group/un
 
 ## 📦 Installation
 
-### From Releases (Recommended)
+### Quick Install (Recommended)
+
+**One-liner for all platforms (macOS, Linux, Windows):**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Litchi-group/unipm/main/install.sh | bash
+```
+
+This script automatically:
+- ✅ Detects your OS and architecture
+- ✅ Downloads the correct binary
+- ✅ Installs to `/usr/local/bin` (macOS/Linux) or `~/bin` (Windows)
+- ✅ Verifies installation
+
+---
+
+### Manual Installation
 
 Download the latest release for your platform:
 
