@@ -83,23 +83,23 @@ Download the latest release for your platform:
 
 **macOS (Intel)**
 ```bash
-curl -L https://github.com/Litchi-group/unipm/releases/latest/download/unipm-darwin-amd64 \
-  -o /usr/local/bin/unipm
-chmod +x /usr/local/bin/unipm
+curl -L https://github.com/Litchi-group/unipm/releases/latest/download/unipm-darwin-amd64 -o /tmp/unipm
+sudo mv /tmp/unipm /usr/local/bin/unipm
+sudo chmod +x /usr/local/bin/unipm
 ```
 
 **macOS (Apple Silicon)**
 ```bash
-curl -L https://github.com/Litchi-group/unipm/releases/latest/download/unipm-darwin-arm64 \
-  -o /usr/local/bin/unipm
-chmod +x /usr/local/bin/unipm
+curl -L https://github.com/Litchi-group/unipm/releases/latest/download/unipm-darwin-arm64 -o /tmp/unipm
+sudo mv /tmp/unipm /usr/local/bin/unipm
+sudo chmod +x /usr/local/bin/unipm
 ```
 
 **Linux (amd64)**
 ```bash
-curl -L https://github.com/Litchi-group/unipm/releases/latest/download/unipm-linux-amd64 \
-  -o /usr/local/bin/unipm
-chmod +x /usr/local/bin/unipm
+curl -L https://github.com/Litchi-group/unipm/releases/latest/download/unipm-linux-amd64 -o /tmp/unipm
+sudo mv /tmp/unipm /usr/local/bin/unipm
+sudo chmod +x /usr/local/bin/unipm
 ```
 
 **Windows (amd64)**
