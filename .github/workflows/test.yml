@@ -36,6 +36,7 @@ jobs:
       run: go mod download
     
     - name: Run tests
+      shell: bash
       run: go test -v -race -coverprofile=coverage.txt ./...
     
     - name: Upload coverage to Codecov
